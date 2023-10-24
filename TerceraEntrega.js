@@ -12,46 +12,16 @@ app.post('/agregar', (req, res) => {
 });
 
 
-// Obtener productos con o sin límite
-app.get('/producto', async (req, res) => {
-  try {
-      const productos = await peticion.ObtenerProductos();
-
-      const limit = parseInt(req.query.limit);
-      if (!isNaN(limit)) {
-          const productosLimitados = productos.slice(0, limit);
-          res.json(productosLimitados);
-      } else {
-          res.json(productos);
-      }
-  } catch (error) {
-      res.status(500).send('Error al obtener los productos');
-  }
-});
-
-// Obtener todos los productos
-app.get('/producto', async (req, res) => {
-  try {
-      const productos = await peticion.ObtenerProductos();
-      res.json(productos);
-  } catch (error) {
-      res.status(500).send('Error al obtener los productos');
-  }
-});
-
-
-// Obtener un producto por ID
+// Obtener Productos con o sin límite
 app.get('/producto', async (req, res) => {
   try {
       const productos = await peticion.ObtenerProductos();
       
       const limit = parseInt(req.query.limit);
-      if (!isNaN(limit)) {
-          // Si se proporciona el parámetro limit en la consulta, devuelve solo los primeros "limit" productos
+      if (!isNaN(limit) && limit > 0) {
           const productosLimitados = productos.slice(0, limit);
           res.json(productosLimitados);
       } else {
-          // Si no se proporciona limit, devuelve todos los productos
           res.json(productos);
       }
   } catch (error) {
@@ -59,6 +29,20 @@ app.get('/producto', async (req, res) => {
   }
 });
 
+// Obtener un producto por ID
+app.get('/producto/:id', async (req, res) => {
+  try {
+      const ID = req.params.id;
+      const producto = await peticion.obtenerProductoPorID(parseInt(ID));
+      if (producto) {
+          res.json(producto);
+      } else {
+          res.status(404).send('Producto no encontrado');
+      }
+  } catch (error) {
+      res.status(500).send('Error al obtener los productos');
+  }
+});
 
 
 
@@ -190,3 +174,4 @@ console.log(peticion.ObtenerProductos());
 
 //Todos los productos: http://localhost:8080/producto/
 //El producto por ID: http://localhost:8080/producto/2
+//Obtener los productos con un limite: http://localhost:8080/producto?limit=5
